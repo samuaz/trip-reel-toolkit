@@ -1,0 +1,11 @@
+# Optional features. Install only what you want:
+#   pip3 install -r requirements-optional.txt
+# or pick individually.
+
+# AI content indexing + Lyria music generation (needs GEMINI_API_KEY)
+google-genai>=0.3.0
+
+# Voice/swearing removal. NOTE: demucs pulls in PyTorch (~1-2 GB) and can be
+# slow to install. Skip it unless you need audio cleanup.
+demucs>=4.0.0
+soundfile>=0.12.0

@@ -1,0 +1,18 @@
+# your personal configuration (contains your paths)
+config.yaml
+
+# render cache / outputs
+__pycache__/
+*.pyc
+/output/
+*.mp4
+*.mov
+*.srt
+*.wav
+
+# music + footage never belong in git
+/music/
+*.mp3
+
+# OS cruft
+.DS_Store

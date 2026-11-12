@@ -1,0 +1,97 @@
+# ============================================================================
+#  trip-reel-toolkit — configuration
+#  Copy this to `config.yaml` (the wizard does it for you) and edit.
+#  Every path may use ~ for your home directory.
+# ============================================================================
+
+project:
+  name: "My Trip"                       # shown on title cards / used for filenames
+  output_dir: "~/trip-reels/output"     # finished reels land here
+  tmp_dir: "~/.cache/trip-reel-toolkit" # render cache (private 0700; safe to delete)
+
+canvas:
+  width: 1920                           # master is horizontal; vertical export rotates it
+  height: 1080
+  fps: 30
+  crossfade: 0.45                       # seconds of xfade/acrossfade between every shot
+
+# --- Your cameras. The NAME (left) is what you reference in a shot list. --------
+#   type: pov        flat 16:9 footage, cropped to the canvas (e.g. DJI/GoPro helmet cam)
+#   type: sphere360  dual-fisheye 360 footage, reframed with v360 (e.g. Insta360 / Osmo 360)
+#   type: photo      still image (Ken-Burns push-in)
+#   has_mic: true    this camera carries usable voice (prioritised for dialogue)
+cameras:
+  pov:
+    path: "/Volumes/FOOTAGE/pov"
+    type: pov
+    has_mic: true
+    extensions: [MP4, LRF, mp4]
+  sphere:
+    path: "/Volumes/FOOTAGE/360"
+    type: sphere360
+    has_mic: true
+    extensions: [insv, mp4, MP4]
+  selects:                              # optional: your own pre-trimmed clips
+    path: "/Volumes/FOOTAGE/_SELECTS"
+    type: pov
+    has_mic: true
+    extensions: [mp4]
+
+fonts:
+  bold: ""                              # leave blank to auto-detect a bold system font
+  regular: ""                           # leave blank to auto-detect a regular system font
+
+# --- Color grades. Each value is an ffmpeg -vf filter chain. Tune to taste. -----
+#   See docs/COLOR_GRADING.md for why these exist (D-Log lift, night, overexposed rolloff).
+grades:
+  dlog:  "curves=all='0/0.03 0.10/0.24 0.30/0.50 0.55/0.70 0.85/0.92 1/1',eq=contrast=1.04:saturation=1.30:gamma=1.22"
+  dlogl: "curves=all='0/0.05 0.10/0.28 0.28/0.54 0.55/0.74 0.85/0.93 1/1',eq=contrast=1.03:saturation=1.28:brightness=0.02:gamma=1.30"
+  dlogb: "curves=all='0/0.03 0.35/0.37 0.60/0.60 0.80/0.64 1/0.78',eq=contrast=1.03:saturation=1.20:gamma=1.08"
+  nat:   "curves=all='0/0 0.06/0.04 0.5/0.52 0.94/0.97 1/1',eq=contrast=1.06:saturation=1.22:gamma=1.03"
+  lift:  "curves=all='0/0.06 0.22/0.26 0.5/0.54 0.75/0.78 1/0.94',eq=contrast=1.05:saturation=1.22:brightness=0.035:gamma=1.20"
+  night: "hqdn3d=4:3:6:4,eq=brightness=0.14:gamma=1.6:contrast=1.05"
+
+# --- 360 reframe: a palette of virtual cameras from one sphere. -----------------
+#   Values are [yaw, pitch, roll]. See docs/CAMERAS_AND_AUDIO.md for the roll=-90 trick.
+angles360:
+  hero:   [180, -8, -90]                # classic 3rd-person (rider facing, level)
+  front:  [0, -8, 90]                   # the road ahead (POV from the selfie stick)
+  dutchL: [180, -8, -50]                # hero on a dynamic diagonal (moving shots only)
+  dutchR: [180, -8, -130]
+reframe360_fov:
+  ih_fov: 193
+  iv_fov: 193
+  h_fov: 150
+  v_fov: 85
+
+audio:
+  voice_filter:   "highpass=f=90,acompressor=threshold=0.04:ratio=4:attack=8:release=220:makeup=2,equalizer=f=2700:t=q:w=1.4:g=4,loudnorm=I=-11:TP=-1.3:LRA=10"
+  ambient_filter: "highpass=f=120,loudnorm=I=-20:TP=-2:LRA=12"
+  music_volume: 0.20
+  duck: { threshold: 0.02, ratio: 14, attack: 8, release: 360 }
+  music_dir: "~/trip-reels/music"
+  default_music: "epic_01.mp3"
+
+# --- External tools (local, free). Leave whisper blank to skip transcription. ---
+tools:
+  whisper_cli: ""                       # e.g. /opt/homebrew/bin/whisper-cli (whisper.cpp)
+  whisper_model: ""                     # e.g. ~/.whisper-models/ggml-large-v3-turbo-q5_0.bin
+  whisper_lang: "en"
+  ffmpeg_workers: 1                     # keep at 1 if your footage is on a flaky external disk
+
+# --- AI services (optional). API keys come from environment variables. ----------
+#   GEMINI_API_KEY  (or GOOGLE_API_KEY) enables index_ai + music generation.
+ai:
+  gemini_model: "gemini-3.6-flash"
+  lyria_model: "models/lyria-3.5"
+  index_window_s: 120                   # seconds per analysis window
+  index_fps: 4
+  index_px: 720
+
+# --- Hallucination guardrail (optional). Neutralises AI-invented script tokens --
+#   that cannot exist before a given date (classic case: CJK text before you
+#   entered that country). Leave token_regex blank to disable.
+guardrail:
+  token_regex: ""                       # e.g. "[㐀-鿿豈-﫿]" for CJK
+  allowed_from_date: "20260812"         # YYYYMMDD; tokens allowed from this date on
+  filename_date_regex: "(20\\d{6})"     # how to read the date out of a filename

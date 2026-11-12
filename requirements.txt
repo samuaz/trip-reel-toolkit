@@ -1,0 +1,13 @@
+# Core dependencies (required for building reels). Light + fast to install.
+PyYAML>=6.0
+Pillow>=9.0
+
+# Optional features live in requirements-optional.txt (AI indexing, music,
+# demucs voice removal) so the base install stays small and reliable.
+#
+# System tools are NOT pip packages — install them separately:
+#   ffmpeg + ffprobe   macOS: brew install ffmpeg      Debian: sudo apt install ffmpeg
+#   whisper.cpp        macOS: brew install whisper-cpp  (gives the `whisper-cli` binary)
+#                      + a model, e.g. ggml-large-v3-turbo-q5_0.bin
+#
+# Run `python3 scripts/doctor.py` to see exactly what is present and what to install.
